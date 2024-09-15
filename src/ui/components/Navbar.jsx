@@ -6,7 +6,7 @@ import DeleteUserModal from './DeleteUserModal';
 import AgencyForm from './AgencyForm'; 
 import Swal from 'sweetalert2';
 
-const Navbar = () => {
+const Navbar = ({ onAgencyCreated }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateAgencyModalOpen, setIsCreateAgencyModalOpen] = useState(false); 
@@ -48,7 +48,7 @@ const Navbar = () => {
       const token = localStorage.getItem('token');
       await axios.post('http://localhost:3000/usuarios', userData, {
         headers: {
-          'x-token': token,
+          'token': token,
         },
       });
 
@@ -69,7 +69,7 @@ const Navbar = () => {
       const token = localStorage.getItem('token');
       await axios.delete(`http://localhost:3000/usuarios/${userId}`, {
         headers: {
-          'x-token': token,
+          'token': token,
         },
       });
 
@@ -88,30 +88,43 @@ const Navbar = () => {
   const handleCreateAgency = async (agencyData) => {
     try {
       const token = localStorage.getItem('token');
-  
-      console.log(agencyData); // Verifica qué datos estás enviando
-  
       await axios.post('http://localhost:3000/agencias', agencyData, {
         headers: {
-          'x-token': token,
+          'token': token,
           'Content-Type': 'application/json',
-        }
+        },
       });
-  
+
       Swal.fire({
         icon: 'success',
         title: 'Agencia creada con éxito',
         text: 'La nueva agencia ha sido creada correctamente.',
       });
-  
+
       closeModal();
-      
+
+      // Llama a la función para actualizar la lista de agencias
+      if (onAgencyCreated) {
+        onAgencyCreated();
+      }
     } catch (err) {
-      console.error('Error al crear agencia:', err); // Detalle el error aquí
+      console.error('Error al crear agencia:', err);
+    if (err.response && err.response.status === 400 && err.response.data.msg === 'Ya existe una agencia con este nombre') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al crear agencia',
+        text: 'Ya existe una agencia con este nombre. Por favor, elige un nombre diferente.',
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al crear agencia',
+        text: 'Ha ocurrido un error al crear la agencia. Por favor, inténtalo de nuevo.',
+      });
+    }
     }
   };
   
-
   return (
     <>
       <nav className="bg-white shadow-md p-4 flex justify-between items-center">

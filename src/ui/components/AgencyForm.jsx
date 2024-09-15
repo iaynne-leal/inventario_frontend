@@ -1,22 +1,49 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const AgencyForm = ({ onClose, onCreateAgency }) => {
   const [nombre, setNombre] = useState('');
-  const [especial, setEspecial] = useState(false); // Estado para gestionar si la agencia es especial
+  const [especial, setEspecial] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newAgency = { 
-      nombre_agencia: nombre,
-      especial: especial  // Añadir si la agencia es especial o no
-    };
-    onCreateAgency(newAgency);  // Llamar a la función proporcionada por el padre
+    setError('');
+
+    if (!nombre.trim()) {
+      setError('El nombre de la agencia es requerido');
+      return;
+    }
+
+    try {
+      // Verificar si ya existe una agencia con el mismo nombre
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`http://localhost:3000/agencias`, {
+        headers: { 'token': token }
+      });
+      const agencias = response.data.agencias;
+      
+      if (agencias.some(agencia => agencia.nombre_agencia.toLowerCase() === nombre.toLowerCase())) {
+        setError('Ya existe una agencia con este nombre');
+        return;
+      }
+
+      const newAgency = { 
+        nombre_agencia: nombre,
+        especial: especial
+      };
+      onCreateAgency(newAgency);
+    } catch (error) {
+      console.error('Error al verificar agencias:', error);
+      setError('Error al verificar el nombre de la agencia. Por favor, intenta de nuevo.');
+    }
   };
 
   return (
     <div className="fixed inset-0 bg-blue-900 bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-6 rounded shadow-md w-96">
         <h3 className="text-xl font-bold mb-4 text-blue-900">Crear Nueva Agencia</h3>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -26,7 +53,6 @@ const AgencyForm = ({ onClose, onCreateAgency }) => {
             onChange={(e) => setNombre(e.target.value)}
           />
           
-          {/* Checkbox para definir si es especial */}
           <div className="mb-4">
             <label className="inline-flex items-center">
               <input
