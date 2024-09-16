@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000'; // Cambia esto a la URL de tu backend
+const API_URL = 'http://localhost:8080'; // Cambia esto a la URL de tu backend
 
 export const getAgencias = async () => {
   try {

@@ -63,7 +63,7 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
       if (!token) {
         throw new Error('No se encontró el token de autenticación');
       }
-      const response = await axios.get(`http://localhost:3000/equipo/${puesto.id_puesto}`, {
+      const response = await axios.get(`http://localhost:8080/equipo/${puesto.id_puesto}`, {
         headers: {
           'token': token
         }
@@ -100,7 +100,7 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
       if (!token) {
         throw new Error('No se encontró el token de autenticación');
       }
-      await axios.post('http://localhost:3000/equipo', {
+      await axios.post('http://localhost:8080/equipo', {
         id_puesto: puesto.id_puesto,
         hardware: newEquipo.hardware,
         software: newEquipo.software

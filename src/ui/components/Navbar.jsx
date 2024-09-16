@@ -46,7 +46,7 @@ const Navbar = ({ onAgencyCreated }) => {
   const handleCreateUser = async (userData) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:3000/usuarios', userData, {
+      await axios.post('http://localhost:8080/usuarios', userData, {
         headers: {
           'token': token,
         },
@@ -67,7 +67,7 @@ const Navbar = ({ onAgencyCreated }) => {
   const handleDeleteUser = async (userId) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:3000/usuarios/${userId}`, {
+      await axios.delete(`http://localhost:8080/usuarios/${userId}`, {
         headers: {
           'token': token,
         },
@@ -88,7 +88,7 @@ const Navbar = ({ onAgencyCreated }) => {
   const handleCreateAgency = async (agencyData) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:3000/agencias', agencyData, {
+      await axios.post('http://localhost:8080/agencias', agencyData, {
         headers: {
           'token': token,
           'Content-Type': 'application/json',
