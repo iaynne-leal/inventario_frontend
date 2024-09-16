@@ -68,8 +68,8 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
           'token': token
         }
       });
-      if (response.data) {
-        setEquipo(response.data);
+      if (response.data && response.data.equipo) {
+        setEquipo(response.data.equipo);
       } else {
         setEquipo(null);
       }
@@ -80,9 +80,10 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
         title: 'Error',
         text: error.message || 'No se pudo obtener la información del equipo. Intenta de nuevo.',
       });
+      setEquipo(null);
     }
   };
-
+  
   const handleInputChange = (category, field, value) => {
     setNewEquipo(prev => ({
       ...prev,
