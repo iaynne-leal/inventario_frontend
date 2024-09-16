@@ -63,31 +63,27 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
       if (!token) {
         throw new Error('No se encontró el token de autenticación');
       }
-      console.log('Token:', token); // Para depuración
       const response = await axios.get(`http://localhost:3000/equipo/${puesto.id_puesto}`, {
         headers: {
           'token': token
         }
       });
-      console.log('Respuesta:', response.data); // Para depuración
-      if (response.data) {
-        setEquipo(response.data);
+      if (response.data && response.data.equipo) {
+        setEquipo(response.data.equipo);
       } else {
         setEquipo(null);
       }
     } catch (error) {
       console.error('Error al obtener equipo:', error);
-      if (error.response) {
-        console.error('Respuesta del servidor:', error.response.data);
-      }
       Swal.fire({
         icon: 'error',
         title: 'Error',
         text: error.message || 'No se pudo obtener la información del equipo. Intenta de nuevo.',
       });
+      setEquipo(null);
     }
   };
-
+  
   const handleInputChange = (category, field, value) => {
     setNewEquipo(prev => ({
       ...prev,
@@ -105,8 +101,7 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
       if (!token) {
         throw new Error('No se encontró el token de autenticación');
       }
-      console.log('Token para crear equipo:', token);
-      const response = await axios.post('http://localhost:3000/equipo', {
+      await axios.post('http://localhost:3000/equipo', {
         id_puesto: puesto.id_puesto,
         hardware: newEquipo.hardware,
         software: newEquipo.software
@@ -115,7 +110,6 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
           'token': token
         }
       });
-      console.log('Respuesta al crear equipo:', response.data); // Para depuración
       setIsCreating(false);
       await fetchEquipo();
       Swal.fire({
@@ -125,16 +119,6 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
       });
     } catch (error) {
       console.error('Error al crear equipo:', error);
-      if (error.response) {
-        console.error('Respuesta del servidor:', error.response.data);
-        console.error('Estado de la respuesta:', error.response.status);
-        console.error('Headers de la respuesta:', error.response.headers);
-      } else if (error.request) {
-        console.error('La solicitud fue hecha pero no se recibió respuesta');
-        console.error(error.request);
-      } else {
-        console.error('Error al configurar la solicitud', error.message);
-      }
       Swal.fire({
         icon: 'error',
         title: 'Error al crear equipo',
@@ -144,11 +128,7 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
   };
 
   const renderFields = (data, category, editable = false) => {
-    const fields = category === 'hardware' 
-      ? ['codigo_contable', 'marca', 'escritorio_laptop', 'almacenamiento', 'motherboard', 'procesador', 'frecuencia', 'nucleos', 'hilos', 'arquitectura', 'gpu', 'ram', 'ssd', 'ssd2']
-      : ['sistema_operativo', 'winrar', 'adobe_acrobat', 'crystaldesk', 'eset', 'navegadores', 'cpu_z', 'microsoft_office', 'topaz', 'sparck', 'tally_dascom', 'ultra_vnc', 'autocad', 'anydesk', 'google_earth', 'drivereasy', 'nitropro', 'brother_ads', 'obs_studio', 'zoom', 'putty', 'epson', 'kyocera', 'adobe_photoshop', 'adobe_lightroom', 'batery_alarm_analytics'];
-
-    return fields.map(field => (
+    return Object.entries(data).map(([field, value]) => (
       <tr key={field}>
         <td className="border border-gray-300 p-2 font-semibold">{field.replace('_', ' ').toUpperCase()}</td>
         <td className="border border-gray-300 p-2">
@@ -181,14 +161,14 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
               />
             )
           ) : (
-            data[field]
+            value
           )}
         </td>
       </tr>
     ));
   };
 
-  const renderEquipoTable = (data, category) => (
+  const renderEquipoTable = (data, category, editable = false) => (
     <table className="w-full border-collapse mb-4">
       <thead>
         <tr className="bg-gray-100">
@@ -197,12 +177,7 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
         </tr>
       </thead>
       <tbody>
-        {Object.entries(data).map(([key, value]) => (
-          <tr key={key}>
-            <td className="border border-gray-300 p-2 font-semibold">{key.replace('_', ' ').toUpperCase()}</td>
-            <td className="border border-gray-300 p-2">{value}</td>
-          </tr>
-        ))}
+        {renderFields(data, category, editable)}
       </tbody>
     </table>
   );
@@ -234,18 +209,34 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
       <div className="bg-white border rounded-b-lg p-4">
         {equipo ? (
           <div>
-            <h3 className="text-lg font-semibold mb-2">Hardware</h3>
-            {renderEquipoTable(equipo.hardware, 'hardware')}
-            <h3 className="text-lg font-semibold mb-2">Software</h3>
-            {renderEquipoTable(equipo.software, 'software')}
+            {activeTab === 'hardware' && (
+              <>
+                <h3 className="text-lg font-semibold mb-2">Hardware</h3>
+                {renderEquipoTable(equipo.hardware, 'hardware')}
+              </>
+            )}
+            {activeTab === 'software' && (
+              <>
+                <h3 className="text-lg font-semibold mb-2">Software</h3>
+                {renderEquipoTable(equipo.software, 'software')}
+              </>
+            )}
           </div>
         ) : isCreating ? (
           <form onSubmit={handleCreateEquipo}>
             <div className="mb-4">
-              <h3 className="text-lg font-semibold mb-2">Hardware</h3>
-              {renderEquipoTable(newEquipo.hardware, 'hardware', true)}
-              <h3 className="text-lg font-semibold mb-2">Software</h3>
-              {renderEquipoTable(newEquipo.software, 'software', true)}
+              {activeTab === 'hardware' && (
+                <>
+                  <h3 className="text-lg font-semibold mb-2">Hardware</h3>
+                  {renderEquipoTable(newEquipo.hardware, 'hardware', true)}
+                </>
+              )}
+              {activeTab === 'software' && (
+                <>
+                  <h3 className="text-lg font-semibold mb-2">Software</h3>
+                  {renderEquipoTable(newEquipo.software, 'software', true)}
+                </>
+              )}
             </div>
             <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
               Crear Equipo
