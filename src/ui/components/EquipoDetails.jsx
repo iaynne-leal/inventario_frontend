@@ -2,56 +2,11 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 
-const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
+const EquipoDetails = ({ puesto, onBack }) => {
   const [activeTab, setActiveTab] = useState("hardware");
   const [equipo, setEquipo] = useState(null);
-  const [isCreating, setIsCreating] = useState(false);
-  const [newEquipo, setNewEquipo] = useState({
-    hardware: {
-      codigo_contable: "",
-      marca: "",
-      escritorio_laptop: "escritorio",
-      almacenamiento: "",
-      motherboard: "",
-      procesador: "",
-      frecuencia: "",
-      nucleos: "",
-      hilos: "",
-      arquitectura: "",
-      gpu: "",
-      ram: "",
-      ssd: "",
-      ssd2: "",
-    },
-    software: {
-      sistema_operativo: "",
-      winrar: "no instalado",
-      adobe_acrobat: "no instalado",
-      crystaldesk: "no instalado",
-      eset: "no instalado",
-      navegadores: "",
-      cpu_z: "no instalado",
-      microsoft_office: "no instalado",
-      topaz: "no instalado",
-      sparck: "no instalado",
-      tally_dascom: "no instalado",
-      ultra_vnc: "no instalado",
-      autocad: "no instalado",
-      anydesk: "no instalado",
-      google_earth: "no instalado",
-      drivereasy: "no instalado",
-      nitropro: "no instalado",
-      brother_ads: "no instalado",
-      obs_studio: "no instalado",
-      zoom: "no instalado",
-      putty: "no instalado",
-      epson: "no instalado",
-      kyocera: "no instalado",
-      adobe_photoshop: "no instalado",
-      adobe_lightroom: "no instalado",
-      batery_alarm_analytics: "no instalado",
-    },
-  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedEquipo, setEditedEquipo] = useState(null);
 
   useEffect(() => {
     fetchEquipo();
@@ -73,25 +28,25 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
       );
       if (response.data && response.data.hardware && response.data.software) {
         setEquipo(response.data);
+        setEditedEquipo(response.data);
       } else {
         setEquipo(null);
+        setEditedEquipo(null);
       }
     } catch (error) {
       console.error("Error al obtener equipo:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text:
-          error.response?.data?.msg ||
-          error.message ||
-          "No se pudo obtener la información del equipo. Intenta de nuevo.",
+        text: error.response?.data?.msg || error.message || "No se pudo obtener la información del equipo. Intenta de nuevo.",
       });
       setEquipo(null);
+      setEditedEquipo(null);
     }
   };
 
   const handleInputChange = (category, field, value) => {
-    setNewEquipo((prev) => ({
+    setEditedEquipo((prev) => ({
       ...prev,
       [category]: {
         ...prev[category],
@@ -100,19 +55,18 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
     }));
   };
 
-  const handleCreateEquipo = async (e) => {
+  const handleEditEquipo = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No se encontró el token de autenticación");
       }
-      await axios.post(
-        "http://localhost:3000/equipo",
+      await axios.put(
+        `http://localhost:3000/equipo/${puesto.id_puesto}`,
         {
-          id_puesto: puesto.id_puesto,
-          hardware: newEquipo.hardware,
-          software: newEquipo.software,
+          hardware: editedEquipo.hardware,
+          software: editedEquipo.software,
         },
         {
           headers: {
@@ -120,22 +74,19 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
           },
         }
       );
-      setIsCreating(false);
+      setIsEditing(false);
       await fetchEquipo();
       Swal.fire({
         icon: "success",
-        title: "Equipo creado con éxito",
-        text: "El nuevo equipo ha sido creado correctamente.",
+        title: "Equipo actualizado con éxito",
+        text: "El equipo ha sido actualizado correctamente.",
       });
     } catch (error) {
-      console.error("Error al crear equipo:", error);
+      console.error("Error al actualizar equipo:", error);
       Swal.fire({
         icon: "error",
-        title: "Error al crear equipo",
-        text:
-          error.response?.data?.msg ||
-          error.message ||
-          "Hubo un error al crear el equipo. Por favor, intente de nuevo.",
+        title: "Error al actualizar equipo",
+        text: error.response?.data?.msg || error.message || "Hubo un error al actualizar el equipo. Por favor, intente de nuevo.",
       });
     }
   };
@@ -150,7 +101,7 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
           {editable ? (
             category === "hardware" && field === "escritorio_laptop" ? (
               <select
-                value={newEquipo[category][field]}
+                value={editedEquipo[category][field]}
                 onChange={(e) =>
                   handleInputChange(category, field, e.target.value)
                 }
@@ -163,7 +114,7 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
               field !== "sistema_operativo" &&
               field !== "navegadores" ? (
               <select
-                value={newEquipo[category][field]}
+                value={editedEquipo[category][field]}
                 onChange={(e) =>
                   handleInputChange(category, field, e.target.value)
                 }
@@ -176,7 +127,7 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
             ) : (
               <input
                 type="text"
-                value={newEquipo[category][field]}
+                value={editedEquipo[category][field]}
                 onChange={(e) =>
                   handleInputChange(category, field, e.target.value)
                 }
@@ -194,9 +145,9 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
   const renderEquipoTable = (data, category, editable = false) => (
     <table className="w-full border-collapse mb-4">
       <thead>
-        <tr className="bg-gray-100">
-          <th className="border border-gray-300 p-2">Campo</th>
-          <th className="border border-gray-300 p-2">Valor</th>
+        <tr className="bg-blue-900">
+          <th className="border border-gray-300 p-2 text-white">Campo</th>
+          <th className="border border-gray-300 p-2 text-white">Valor</th>
         </tr>
       </thead>
       <tbody>{renderFields(data, category, editable)}</tbody>
@@ -207,7 +158,7 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
     <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
       <button
         onClick={onBack}
-        className="mb-4 text-blue-500 hover:text-blue-700"
+        className="mb-4 text-blue-900 hover:text-blue-700"
       >
         ← Volver a Puestos
       </button>
@@ -215,11 +166,11 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
         Equipo para el puesto: {puesto.nombre_puesto}
       </h2>
   
-      {equipo && !isCreating && (
+      {equipo && (
         <div className="mb-4">
           <button
             className={`mr-2 px-4 py-2 rounded-t-lg ${
-              activeTab === "hardware" ? "bg-blue-500 text-white" : "bg-gray-200"
+              activeTab === "hardware" ? "bg-blue-900 text-white" : "bg-gray-200"
             }`}
             onClick={() => setActiveTab("hardware")}
           >
@@ -227,7 +178,7 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
           </button>
           <button
             className={`px-4 py-2 rounded-t-lg ${
-              activeTab === "software" ? "bg-blue-500 text-white" : "bg-gray-200"
+              activeTab === "software" ? "bg-blue-900 text-white" : "bg-gray-200"
             }`}
             onClick={() => setActiveTab("software")}
           >
@@ -242,41 +193,48 @@ const EquipoDetails = ({ puesto, onCreateEquipo, onBack }) => {
             {activeTab === "hardware" && (
               <>
                 <h3 className="text-lg font-semibold mb-2">Hardware</h3>
-                {renderEquipoTable(equipo.hardware, "hardware")}
+                {renderEquipoTable(isEditing ? editedEquipo.hardware : equipo.hardware, "hardware", isEditing)}
               </>
             )}
             {activeTab === "software" && (
               <>
                 <h3 className="text-lg font-semibold mb-2">Software</h3>
-                {renderEquipoTable(equipo.software, "software")}
+                {renderEquipoTable(isEditing ? editedEquipo.software : equipo.software, "software", isEditing)}
               </>
             )}
+            {isEditing ? (
+              <div className="mt-4">
+                <button
+                  onClick={handleEditEquipo}
+                  className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2"
+                >
+                  Guardar Cambios
+                </button>
+                <button
+                  onClick={() => {
+                    setIsEditing(false);
+                    setEditedEquipo(equipo);
+                  }}
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-600"
+              >
+                Editar Equipo
+              </button>
+            )}
           </div>
-        ) : isCreating ? (
-          <form onSubmit={handleCreateEquipo}>
-            <div className="flex flex-col md:flex-row md:space-x-4">
-              <div className="md:w-1/2 mb-4 md:mb-0">
-                <h3 className="text-lg font-semibold mb-2">Hardware</h3>
-                {renderEquipoTable(newEquipo.hardware, "hardware", true)}
-              </div>
-              <div className="md:w-1/2">
-                <h3 className="text-lg font-semibold mb-2">Software</h3>
-                {renderEquipoTable(newEquipo.software, "software", true)}
-              </div>
-            </div>
-            <button
-              type="submit"
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Crear Equipo
-            </button>
-          </form>
         ) : (
           <div>
             <p className="mb-4">No hay equipo asignado a este puesto.</p>
             <button
-              onClick={() => setIsCreating(true)}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              onClick={() => {}}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-600"
             >
               Crear Equipo
             </button>

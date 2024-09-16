@@ -286,7 +286,7 @@ const Dashboard = ({ shouldUpdateAgencies, onAgenciesUpdated }) => {
       </h2>
       <button
         onClick={() => setView("agencias")}
-        className="mb-4 text-blue-500 hover:text-blue-700"
+        className="mb-4 text-blue-900 hover:text-blue-700"
       >
         ← Volver a Agencias
       </button>
@@ -313,7 +313,7 @@ const Dashboard = ({ shouldUpdateAgencies, onAgenciesUpdated }) => {
       </h2>
       <button
         onClick={() => setView(selectedAgencia.especial ? "areas" : "agencias")}
-        className="mb-4 text-blue-500 hover:text-blue-700"
+        className="mb-4 text-blue-900 hover:text-blue-700"
       >
         ← Volver a {selectedAgencia.especial ? "Áreas" : "Agencias"}
       </button>
@@ -344,7 +344,7 @@ const Dashboard = ({ shouldUpdateAgencies, onAgenciesUpdated }) => {
       </h2>
       <button
         onClick={() => setView("departamentos")}
-        className="mb-4 text-blue-500 hover:text-blue-700"
+        className="mb-4 text-blue-900 hover:text-blue-700"
       >
         ← Volver a Departamentos
       </button>
