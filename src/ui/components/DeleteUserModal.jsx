@@ -9,7 +9,7 @@ const DeleteUserModal = ({ onClose, onDeleteUser }) => {
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/usuarios', {
+        const response = await axios.get('http://localhost:8080/usuarios', {
           headers: {
             'x-token': token
           }

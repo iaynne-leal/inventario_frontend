@@ -11,7 +11,7 @@ const DeleteDepartmentModal = ({ onClose, onDeleteDepartment }) => {
     const fetchAgencies = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/agencias', {
+        const response = await axios.get('http://localhost:8080/agencias', {
           headers: {
             'token': token
           }
@@ -30,7 +30,7 @@ const DeleteDepartmentModal = ({ onClose, onDeleteDepartment }) => {
       if (selectedAgency) {
         try {
           const token = localStorage.getItem('token');
-          const response = await axios.get(`http://localhost:3000/departamentos/${selectedAgency}`, {
+          const response = await axios.get(`http://localhost:8080/departamentos/${selectedAgency}`, {
             headers: {
               'token': token
             }

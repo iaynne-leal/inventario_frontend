@@ -37,7 +37,7 @@ const Dashboard = ({ shouldUpdateAgencies, onAgenciesUpdated }) => {
     if (!token) return;
 
     try {
-      const response = await axios.get("http://localhost:3000/agencias", {
+      const response = await axios.get("http://localhost:8080/agencias", {
         headers: { token: token },
       });
       setAgencias(response.data.agencias);
@@ -57,7 +57,7 @@ const Dashboard = ({ shouldUpdateAgencies, onAgenciesUpdated }) => {
     try {
       if (agencia.especial) {
         const areasResponse = await axios.get(
-          `http://localhost:3000/areas/${agencia.id_agencia}`,
+          `http://localhost:8080/areas/${agencia.id_agencia}`,
           {
             headers: { token: token },
           }
@@ -67,7 +67,7 @@ const Dashboard = ({ shouldUpdateAgencies, onAgenciesUpdated }) => {
         setDepartamentos([]);
       } else {
         const departamentosResponse = await axios.get(
-          `http://localhost:3000/departamentos/${agencia.id_agencia}`,
+          `http://localhost:8080/departamentos/${agencia.id_agencia}`,
           {
             headers: { token: token },
           }
@@ -89,7 +89,7 @@ const Dashboard = ({ shouldUpdateAgencies, onAgenciesUpdated }) => {
 
     try {
       const response = await axios.get(
-        `http://localhost:3000/puestos/${departamentoId}`,
+        `http://localhost:8080/puestos/${departamentoId}`,
         {
           headers: { token: token },
         }
@@ -126,7 +126,7 @@ const Dashboard = ({ shouldUpdateAgencies, onAgenciesUpdated }) => {
 
     try {
       const departamentosResponse = await axios.get(
-        `http://localhost:3000/departamentos/${selectedAgencia.id_agencia}/${area.id_area}`,
+        `http://localhost:8080/departamentos/${selectedAgencia.id_agencia}/${area.id_area}`,
         {
           headers: { token: token },
         }
@@ -155,7 +155,7 @@ const Dashboard = ({ shouldUpdateAgencies, onAgenciesUpdated }) => {
 
     try {
       const response = await axios.get(
-        `http://localhost:3000/equipo/${puesto.id_puesto}`,
+        `http://localhost:8080/equipo/${puesto.id_puesto}`,
         {
           headers: { 'token': token },
         }
@@ -184,7 +184,7 @@ const Dashboard = ({ shouldUpdateAgencies, onAgenciesUpdated }) => {
     if (!token) return;
 
     try {
-      await axios.post("http://localhost:3000/departamentos", departmentData, {
+      await axios.post("http://localhost:8080/departamentos", departmentData, {
         headers: { token: token },
       });
 
@@ -212,7 +212,7 @@ const Dashboard = ({ shouldUpdateAgencies, onAgenciesUpdated }) => {
     if (!token) return;
 
     try {
-      await axios.post("http://localhost:3000/puestos", puestoData, {
+      await axios.post("http://localhost:8080/puestos", puestoData, {
         headers: { token: token },
       });
 
@@ -236,12 +236,12 @@ const Dashboard = ({ shouldUpdateAgencies, onAgenciesUpdated }) => {
     if (!token) return;
 
     try {
-      await axios.post("http://localhost:3000/equipo", equipoData, {
+      await axios.post("http://localhost:8080/equipo", equipoData, {
         headers: { token: token },
       });
       // Actualizar el equipo después de crearlo
       const response = await axios.get(
-        `http://localhost:3000/equipo/${selectedPuesto.id_puesto}`,
+        `http://localhost:8080/equipo/${selectedPuesto.id_puesto}`,
         {
           headers: { token: token },
         }

@@ -16,7 +16,7 @@ const PuestoForm = ({ onClose, onCreatePuesto, departamentoId }) => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:3000/puestos/${departamentoId}`, {
+      const response = await axios.get(`http://localhost:8080/puestos/${departamentoId}`, {
         headers: { 'token': token }
       });
       const puestos = response.data;

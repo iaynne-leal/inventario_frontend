@@ -16,7 +16,7 @@ const DepartmentForm = ({ onClose, onCreateDepartment, agenciaId, areaId, isAgen
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:3000/departamentos/${agenciaId}`, {
+      const response = await axios.get(`http://localhost:8080/departamentos/${agenciaId}`, {
         headers: { 'token': token }
       });
       const departamentos = response.data;

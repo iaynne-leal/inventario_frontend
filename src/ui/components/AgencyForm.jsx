@@ -18,7 +18,7 @@ const AgencyForm = ({ onClose, onCreateAgency }) => {
     try {
       // Verificar si ya existe una agencia con el mismo nombre
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:3000/agencias`, {
+      const response = await axios.get(`http://localhost:8080/agencias`, {
         headers: { 'token': token }
       });
       const agencias = response.data.agencias;
