@@ -19,7 +19,7 @@ const EquipoDetails = ({ puesto, onBack }) => {
         throw new Error("No se encontró el token de autenticación");
       }
       const response = await axios.get(
-        `http://localhost:3000/equipo/${puesto.id_puesto}`,
+        `http://localhost:8080/equipo/${puesto.id_puesto}`,
         {
           headers: {
             token: token,
@@ -63,7 +63,7 @@ const EquipoDetails = ({ puesto, onBack }) => {
         throw new Error("No se encontró el token de autenticación");
       }
       await axios.put(
-        `http://localhost:3000/equipo/${puesto.id_puesto}`,
+        `http://localhost:8080/equipo/${puesto.id_puesto}`,
         {
           hardware: editedEquipo.hardware,
           software: editedEquipo.software,
