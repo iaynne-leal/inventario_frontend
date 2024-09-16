@@ -150,14 +150,14 @@ const Dashboard = ({ shouldUpdateAgencies, onAgenciesUpdated }) => {
 
   const handlePuestoClick = async (puesto) => {
     setSelectedPuesto(puesto);
-    const token = getAuthToken();
+    const token = localStorage.getItem('token');
     if (!token) return;
 
     try {
       const response = await axios.get(
         `http://localhost:3000/equipo/${puesto.id_puesto}`,
         {
-          headers: { token: token },
+          headers: { 'token': token },
         }
       );
       setEquipo(response.data);
